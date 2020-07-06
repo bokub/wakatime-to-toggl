@@ -1,10 +1,10 @@
 const wakaTime = require('./wakatime');
 const toggl = require('./toggl');
 
-module.exports = async function (wakaTimeApiKey, togglApiKey) {
+module.exports = async function (wakaTimeApiKey, togglApiKey, day) {
     // Call WakaTime and Toggl APIs
-    const [wakaTimeActivity, toggleInfo] = await Promise.all([
-        wakaTime.getYesterdayActivity(wakaTimeApiKey),
+    const [wakaTimeActivity, togglInfo] = await Promise.all([
+        wakaTime.getActivity(day, wakaTimeApiKey),
         toggl.getInfo(togglApiKey),
     ]);
 
@@ -18,34 +18,61 @@ module.exports = async function (wakaTimeApiKey, togglApiKey) {
 
     // Find which projects are not in Toggl yet
     const projectsToCreate = wakaTimeProjects.filter(
-        (p) => !toggleInfo.projects.find((t) => t.name.toLowerCase() === p.toLowerCase())
+        (p) => !togglInfo.projects.find((t) => t.name.toLowerCase() === p.toLowerCase())
     );
 
     // Create projects in Toggl
     for (const project of projectsToCreate) {
-        const created = await toggl.createProject(project, toggleInfo.workspaceId, togglApiKey);
+        const created = await toggl.createProject(project, togglInfo.workspaceId, togglApiKey);
         console.info(`created the following project in Toggl: ${created.name}`);
-        toggleInfo.projects.push(created);
+        togglInfo.projects.push(created);
         await sleep(1000); // One request / second to avoid hitting the limit
     }
 
-    const projectIds = toggleInfo.projects.reduce((acc, p) => {
+    const projectIds = togglInfo.projects.reduce((acc, p) => {
         acc[p.name.toLowerCase()] = p.id;
         return acc;
     }, {});
 
     // Add WakaTime entries to Toggl
+    let added = 0;
+    let duplicates = 0;
+    let projects = {};
     for (const entry of wakaTimeActivity) {
         const projectId = projectIds[entry.project];
         if (!projectId) {
             throw new Error(`project "${entry.project}" doesn't exist in Toggl`);
         }
-        await toggl.addEntry(projectId, Math.round(entry.time), Math.round(entry.duration), togglApiKey);
+        const start = new Date(Math.round(entry.time) * 1000).toISOString();
+        const duration = Math.round(entry.duration);
+        if (alreadyExists(projectId, start, duration, togglInfo.entries)) {
+            duplicates++;
+            continue;
+        }
+
+        await toggl.addEntry(projectId, start, duration, togglApiKey);
+        projects[projectId] = true;
+        added++;
         await sleep(1000); // One request / second to avoid hitting the limit
     }
-    console.info(`added ${wakaTimeActivity.length} time entries to ${wakaTimeProjects.length} project(s)`);
+    console.info(
+        `added ${added} time entries to ${
+            Object.keys(projects).length
+        } project(s). ${duplicates} entries were already in Toggl`
+    );
 };
 
 function sleep(ms) {
     return new Promise((res) => setTimeout(res, ms));
+}
+
+function alreadyExists(projectId, start, duration, entries) {
+    return Boolean(
+        entries.find(
+            (entry) =>
+                entry.start.substr(0, 19) === start.substr(0, 19) &&
+                entry.duration === duration &&
+                entry.pid === projectId
+        )
+    );
 }

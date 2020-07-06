@@ -12,6 +12,7 @@ const cli = meow(
     Options
       --wakatime, -w  Your Wakatime api key
       --toggl,    -t  Your Toggl api key
+      --day,      -d  The day to fetch. 0 is today, 1 is yesterday... Default: 1
 `,
     {
         flags: {
@@ -25,15 +26,13 @@ const cli = meow(
                 alias: 't',
                 isRequired: true,
             },
+            day: {
+                type: 'number',
+                alias: 'd',
+                default: 1,
+            },
         },
     }
 );
-/*
-{
-    input: ['unicorns'],
-    flags: {rainbow: true},
-    ...
-}
-*/
 
-syncActivity(cli.flags.wakatime, cli.flags.toggl);
+syncActivity(cli.flags.wakatime, cli.flags.toggl, cli.flags.day);

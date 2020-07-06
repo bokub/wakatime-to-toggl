@@ -28,14 +28,14 @@ module.exports = {
                 return {
                     workspaceId: resp.default_wid,
                     projects: resp.projects.filter((p) => !p.server_deleted_at),
-                    entries: resp.time_entries,
+                    entries: resp.time_entries || [],
                 };
             })
             .catch((err) => {
                 if (err.response) {
                     console.error(err.response.data);
                 }
-                throw new Error(`Cannot fetch Toggl projects: ${err}`);
+                throw new Error(`cannot fetch Toggl projects: ${err}`);
             });
     },
     createProject: async function (name, workspaceId, apiKey) {
@@ -60,11 +60,10 @@ module.exports = {
                 if (err.response) {
                     console.error(err.response.data);
                 }
-                throw new Error(`Cannot create Toggl project ${name}: ${err}`);
+                throw new Error(`cannot create Toggl project ${name}: ${err}`);
             });
     },
     addEntry: async function (projectId, start, duration, apiKey) {
-        const startStr = new Date(start * 1000).toISOString();
         return instance
             .post(
                 'time_entries',
@@ -72,7 +71,7 @@ module.exports = {
                     time_entry: {
                         description: 'Development',
                         duration: duration,
-                        start: startStr,
+                        start: start,
                         pid: projectId,
                         created_with: 'wakatime-to-toggl',
                     },
@@ -89,7 +88,7 @@ module.exports = {
                 if (err.response) {
                     console.error(err.response.data);
                 }
-                throw new Error(`Cannot create Toggl entry : ${err}`);
+                throw new Error(`cannot create Toggl entry : ${err}`);
             });
     },
 };
