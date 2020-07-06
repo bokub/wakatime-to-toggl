@@ -1,0 +1,22 @@
+{
+    "name": "watatime-to-toggl",
+    "version": "0.1.0",
+    "description": "",
+    "main": "cli.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "prettier": "prettier --write **/*.{js,md,json}"
+    },
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "axios": "^0.19.2",
+        "meow": "^7.0.1"
+    },
+    "bin": "cli.js",
+    "prettier": {
+        "singleQuote": true,
+        "tabWidth": 4,
+        "printWidth": 120
+    }
+}
