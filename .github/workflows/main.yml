@@ -1,0 +1,17 @@
+name: Run wakatime-to-toggl everyday
+
+on:
+  schedule:    
+  - cron: "*30 2 * * *" # Everyday at 02:30 AM
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: npx wakatime-to-toggl -w "$WAKATIME_API_KEY" -t "$TOGGL_API_KEY"
+        env:
+          TOGGL_API_KEY: ${{ secrets.TOGGL_API_KEY }}
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
