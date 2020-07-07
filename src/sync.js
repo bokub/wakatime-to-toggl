@@ -39,7 +39,7 @@ module.exports = async function (wakaTimeApiKey, togglApiKey, day) {
     let duplicates = 0;
     let projects = {};
     for (const entry of wakaTimeActivity) {
-        const projectId = projectIds[entry.project];
+        const projectId = projectIds[entry.project.toLowerCase()];
         if (!projectId) {
             throw new Error(`project "${entry.project}" doesn't exist in Toggl`);
         }

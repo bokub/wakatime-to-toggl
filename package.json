@@ -1,7 +1,7 @@
 {
     "name": "wakatime-to-toggl",
     "description": "Send your WakaTime data to Toggl",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "author": "Boris K",
     "bin": {
         "wakatime-to-toggl": "cli.js"
@@ -29,6 +29,6 @@
     },
     "repository": "bokub/wakatime-to-toggl",
     "scripts": {
-        "prettier": "prettier --write **/*.{js,md,json}"
+        "prettier": "prettier --write **/*.{js,md,json,yml}"
     }
 }
