@@ -2,7 +2,7 @@ name: Run wakatime-to-toggl everyday
 
 on:
   schedule:    
-  - cron: "*30 2 * * *" # Everyday at 02:30 AM
+  - cron: "30 2 * * *" # Everyday at 02:30 AM
 
 jobs:
   run:
