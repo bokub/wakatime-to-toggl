@@ -8,33 +8,52 @@ Sync your WakaTime data in Toggl. Works with free accounts
 
 ## Prerequisites
 
--   Get your Wakatime "Secret API Key" in [your account settings](https://wakatime.com/settings/account)
+-   Get your Wakatime API key in [your settings](https://wakatime.com/settings/api-key)
 -   Get your Toggl "API Token" at the bottom of [your profile page](https://www.toggl.com/app/profile)
 
 ## Option 1 - Run manually on your computer
 
--   Download and install [Node.js](https://nodejs.org/en/download/)
--   Install **wakatime-to-toggl** with `npm i -g wakatime-to-toggl`
--   Run `wakatime-to-toggl -w <wakatime-api-key> -t <toggl-api-key>` to sync data from yesterday
--   Ideally, run `wakatime-to-toggl` everyday
+1.   Download and install [Node.js](https://nodejs.org/en/download/)
+2.   Install **wakatime-to-toggl** with `npm i -g wakatime-to-toggl`
+3.   Run `wakatime-to-toggl -w <wakatime-api-key> -t <toggl-api-key>` to sync data from yesterday
+4.   Ideally, run `wakatime-to-toggl` everyday
 
 ## Option 2 - Run automatically everyday using Github Actions
 
--   Fork this repository
--   From your new fork, click on the "Settings" tab on the right
-    ![Settings tab](https://user-images.githubusercontent.com/17952318/86905596-9618c800-c112-11ea-819c-137afc644d37.png)
+1. Fork this repository
+2. From your new fork, to to **Settings > Secrets**
+3. Add the following secrets using the **New secret** button:
+  - `TOGGL_API_KEY`: Your Toggl API Key
+  - `WAKATIME_API_KEY`: Your Wakatime API Key
+  ![Screenshot](https://user-images.githubusercontent.com/17952318/86905384-4934f180-c112-11ea-91cd-7b391cd7e5de.png)
 
--   Click on "Secrets" in the left menu
--   Click "New Secret" and add your **WakaTime** API Key in a secret named `WAKATIME_API_KEY`
--   Click "New Secret" and add your **Toggl** API Key in a secret named `TOGGL_API_KEY`
-    ![Screenshot](https://user-images.githubusercontent.com/17952318/86905384-4934f180-c112-11ea-91cd-7b391cd7e5de.png)
+4. Go to the **Actions** tab of your fork
+5. Click **set up a workflow yourself**
+6. Copy-paste this workflow:
+```yaml
+---
+name: Run wakatime-to-toggl everyday
+on:
+  schedule:
+  - cron: 30 2 * * * # Everyday at 02:30 AM UTC. You can change it according to your timezone
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - run: npx wakatime-to-toggl -w "$WAKATIME_API_KEY" -t "$TOGGL_API_KEY"
+      env:
+        TOGGL_API_KEY: "${{ secrets.TOGGL_API_KEY }}"
+        WAKATIME_API_KEY: "${{ secrets.WAKATIME_API_KEY }}"
 
--   Go to the "Actions" tab of your fork and click the green button
-    ![Actions](https://user-images.githubusercontent.com/17952318/86906074-4981bc80-c113-11ea-9433-18eb7d5972f7.png)
+``` 
+7. Click **Start commit** then **Commit new file** to save
 
-That's it! **wakatime-to-toggl** will run every day at 2:30 AM UTC, just be patient
+That's it! **wakatime-to-toggl** will run every day at 2:30 AM UTC (unless you changed it in the workflow)
 
-You can come back to the "Actions" tab of your fork to see the logs
+You can come back to the **Actions** tab later to see the logs
 
 ## Things to know
 
