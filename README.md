@@ -31,7 +31,6 @@ Sync your WakaTime data in Toggl. Works with free accounts
 5. Click **set up a workflow yourself**
 6. Copy-paste this workflow:
 ```yaml
----
 name: Run wakatime-to-toggl everyday
 on:
   schedule:
