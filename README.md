@@ -15,13 +15,13 @@ Sync your WakaTime data in Toggl. Works with free accounts
 
 1.   Download and install [Node.js](https://nodejs.org/en/download/)
 2.   Install **wakatime-to-toggl** with `npm i -g wakatime-to-toggl`
-3.   Run `wakatime-to-toggl -w <wakatime-api-key> -t <toggl-api-key>` to sync data from yesterday
-4.   Ideally, run `wakatime-to-toggl` everyday
+3.   Run the following command to sync data from yesterday: `wakatime-to-toggl -w <wakatime-api-key> -t <toggl-api-key>`
+4.   Ideally, run **wakatime-to-toggl** everyday
 
 ## Option 2 - Run automatically everyday using Github Actions
 
 1. Fork this repository
-2. From your new fork, to to **Settings > Secrets**
+2. From your new fork, go to **Settings > Secrets**
 3. Add the following secrets using the **New secret** button:
   - `TOGGL_API_KEY`: Your Toggl API Key
   - `WAKATIME_API_KEY`: Your Wakatime API Key
