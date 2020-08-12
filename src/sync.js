@@ -1,12 +1,11 @@
 const wakaTime = require('./wakatime');
 const toggl = require('./toggl');
+const ora = require('ora');
 
 module.exports = async function (wakaTimeApiKey, togglApiKey, day) {
     // Call WakaTime and Toggl APIs
-    const [wakaTimeActivity, togglInfo] = await Promise.all([
-        wakaTime.getActivity(day, wakaTimeApiKey),
-        toggl.getInfo(togglApiKey),
-    ]);
+    const wakaTimeActivity = await wakaTime.getActivity(day, wakaTimeApiKey);
+    const togglInfo = await toggl.getInfo(togglApiKey);
 
     // List all WakaTime projects
     const wakaTimeProjects = Object.keys(
@@ -24,7 +23,6 @@ module.exports = async function (wakaTimeApiKey, togglApiKey, day) {
     // Create projects in Toggl
     for (const project of projectsToCreate) {
         const created = await toggl.createProject(project, togglInfo.workspaceId, togglApiKey);
-        console.info(`created the following project in Toggl: ${created.name}`);
         togglInfo.projects.push(created);
         await sleep(1000); // One request / second to avoid hitting the limit
     }
@@ -38,6 +36,7 @@ module.exports = async function (wakaTimeApiKey, togglApiKey, day) {
     let added = 0;
     let duplicates = 0;
     let projects = {};
+    const spinner = ora('Adding entries to Toggl...').start();
     for (const entry of wakaTimeActivity) {
         const projectId = projectIds[entry.project.toLowerCase()];
         if (!projectId) {
@@ -47,18 +46,23 @@ module.exports = async function (wakaTimeApiKey, togglApiKey, day) {
         const duration = Math.round(entry.duration);
         if (alreadyExists(projectId, start, duration, togglInfo.entries)) {
             duplicates++;
+            spinner.text = `Added ${added}/${wakaTimeActivity.length} entries to Toggl... Found ${duplicates} duplicates`;
             continue;
         }
 
         await toggl.addEntry(projectId, start, duration, togglApiKey);
+        spinner.text = `Added ${added}/${wakaTimeActivity.length} entries to Toggl...`;
+        if (duplicates > 0) {
+            spinner.text += ` Found ${duplicates} duplicates`;
+        }
         projects[projectId] = true;
         added++;
         await sleep(1000); // One request / second to avoid hitting the limit
     }
-    console.info(
-        `added ${added} time entries to ${
+    spinner.succeed(
+        `Added ${added} time entries to ${
             Object.keys(projects).length
-        } project(s). ${duplicates} entries were already in Toggl`
+        } project(s). ${duplicates} entries were already in Toggl.`
     );
 };
 

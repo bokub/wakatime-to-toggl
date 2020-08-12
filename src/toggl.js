@@ -1,4 +1,5 @@
 const axios = require('axios');
+const ora = require('ora');
 
 const instance = axios.create({
     baseURL: 'https://www.toggl.com/api/v8',
@@ -9,6 +10,8 @@ const instance = axios.create({
 
 module.exports = {
     getInfo: async function (apiKey) {
+        const spinner = ora(`Fetching Toggl projects...`).start();
+
         return instance
             .get('me', {
                 params: {
@@ -25,9 +28,15 @@ module.exports = {
 
             .then((resp) => resp.data.data)
             .then((resp) => {
+                const projects = resp.projects.filter((p) => !p.server_deleted_at);
+                spinner.succeed(
+                    `Found ${projects.length} Toggl projects and ${
+                        resp.time_entries ? resp.time_entries.length : 0
+                    } recent time entries.`
+                );
                 return {
                     workspaceId: resp.default_wid,
-                    projects: resp.projects.filter((p) => !p.server_deleted_at),
+                    projects: projects,
                     entries: resp.time_entries || [],
                 };
             })
@@ -35,10 +44,12 @@ module.exports = {
                 if (err.response) {
                     console.error(err.response.data);
                 }
+                spinner.fail('Cannot fetch Toggl projects');
                 throw new Error(`cannot fetch Toggl projects: ${err}`);
             });
     },
     createProject: async function (name, workspaceId, apiKey) {
+        const spinner = ora(`Creating project "${name}" in Toggl...`);
         return instance
             .post(
                 'projects',
@@ -55,11 +66,15 @@ module.exports = {
                     },
                 }
             )
-            .then((resp) => resp.data.data)
+            .then((resp) => {
+                spinner.succeed(`Created project "${resp.data.data.name}" in Toggl.`);
+                return resp.data.data;
+            })
             .catch((err) => {
                 if (err.response) {
                     console.error(err.response.data);
                 }
+                spinner.fail(`Cannot create Toggl project "${name}"`);
                 throw new Error(`cannot create Toggl project ${name}: ${err}`);
             });
     },
