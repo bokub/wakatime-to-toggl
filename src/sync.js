@@ -59,11 +59,10 @@ module.exports = async function (flags) {
         added++;
         await sleep(1000); // One request / second to avoid hitting the limit
     }
-    spinner.succeed(
-        `Added ${added} time entries to ${
-            Object.keys(projects).length
-        } project(s). ${duplicates} entries were already in Toggl.`
-    );
+    spinner.succeed(`Added ${added} time entries to ${Object.keys(projects).length} project(s).`);
+    if (duplicates > 0) {
+        ora(`${duplicates} entries were already in Toggl.`).info();
+    }
 };
 
 function sleep(ms) {

@@ -3,6 +3,7 @@
 [![Version][version-src]][version-href]
 [![code style: prettier][code-style-src]][code-style-href]
 [![Downloads][downloads-src]][downloads-href]
+[![CI][ci-src]][ci-href]
 
 Sync your WakaTime data in Toggl
 
@@ -10,7 +11,7 @@ Sync your WakaTime data in Toggl
 -   Can be automated with Github Actions
 
 <p align="center">
-  <img width="702" height="213" src="https://user-images.githubusercontent.com/17952318/90112407-397f7d00-dd50-11ea-9ee9-c1250c35127c.gif">
+  <img width="639" height="238" src="https://user-images.githubusercontent.com/17952318/90114480-10acb700-dd53-11ea-9c67-5700705214e5.gif">
 </p>
 
 ## Prerequisites
@@ -87,7 +88,9 @@ $ wakatime-to-toggl --help
 
 [version-src]: https://runkit.io/bokub/npm-version/branches/master/wakatime-to-toggl?style=flat
 [code-style-src]: https://flat.badgen.net/badge/code%20style/prettier/ff69b4
-[downloads-src]: https://flat.badgen.net/npm/dm/wakatime-to-toggl
+[downloads-src]: https://flat.badgen.net/npm/dm/wakatime-to-toggl?color=orange
+[ci-src]: https://flat.badgen.net/travis/bokub/wakatime-to-toggl
 [version-href]: https://www.npmjs.com/package/wakatime-to-toggl
 [code-style-href]: https://github.com/prettier/prettier
 [downloads-href]: https://www.npmjs.com/package/wakatime-to-toggl
+[ci-href]: https://travis-ci.org/bokub/wakatime-to-toggl

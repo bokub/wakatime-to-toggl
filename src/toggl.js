@@ -28,16 +28,15 @@ module.exports = {
 
             .then((resp) => resp.data.data)
             .then((resp) => {
-                const projects = resp.projects.filter((p) => !p.server_deleted_at);
+                const projects = resp.projects ? resp.projects.filter((p) => !p.server_deleted_at) : [];
+                const timeEntries = resp.time_entries || [];
                 spinner.succeed(
-                    `Found ${projects.length} Toggl projects and ${
-                        resp.time_entries ? resp.time_entries.length : 0
-                    } recent time entries.`
+                    `Found ${projects.length} Toggl projects and ${timeEntries.length} recent time entries.`
                 );
                 return {
                     workspaceId: resp.default_wid,
                     projects: projects,
-                    entries: resp.time_entries || [],
+                    entries: timeEntries,
                 };
             })
             .catch((err) => {
