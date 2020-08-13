@@ -4,7 +4,14 @@
 [![code style: prettier][code-style-src]][code-style-href]
 [![Downloads][downloads-src]][downloads-href]
 
-Sync your WakaTime data in Toggl. Works with free accounts. Can be automated with Github Actions.
+Sync your WakaTime data in Toggl
+
+-   Works with free accounts
+-   Can be automated with Github Actions
+
+<p align="center">
+  <img width="702" height="213" src="https://user-images.githubusercontent.com/17952318/90112407-397f7d00-dd50-11ea-9ee9-c1250c35127c.gif">
+</p>
 
 ## Prerequisites
 
@@ -76,7 +83,6 @@ $ wakatime-to-toggl --help
     --toggl,          -t  Your Toggl api key
     --day,            -d  The day to fetch. 0 is today, 1 is yesterday... Default: 1
     --min-duration    -m  Minimum duration (in seconds) of entries to sync. Default: 120
-
 ```
 
 [version-src]: https://runkit.io/bokub/npm-version/branches/master/wakatime-to-toggl?style=flat

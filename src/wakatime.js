@@ -19,14 +19,14 @@ module.exports = {
             .then((resp) => resp.data.data)
             .then((entries) => {
                 const filtered = entries.filter((e) => e.duration >= minDuration);
-                let spinnerText = `Found ${entries.length} WakaTime entries for the ${strDate}.`;
+                spinner.succeed(`Found ${entries.length} WakaTime entries for the ${strDate}.`);
                 if (filtered.length < entries.length) {
-                    spinnerText += ` ${entries.length - filtered.length} of them are shorter than ${prettyMs(
-                        1000 * minDuration,
-                        { verbose: true }
-                    )} and will be ignored.`;
+                    ora(
+                        `${entries.length - filtered.length} entries are shorter than ${prettyMs(1000 * minDuration, {
+                            verbose: true,
+                        })} and will be ignored.`
+                    ).info();
                 }
-                spinner.succeed(spinnerText);
                 return filtered;
             })
             .catch((err) => {
