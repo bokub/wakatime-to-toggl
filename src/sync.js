@@ -2,10 +2,10 @@ const wakaTime = require('./wakatime');
 const toggl = require('./toggl');
 const ora = require('ora');
 
-module.exports = async function (wakaTimeApiKey, togglApiKey, day) {
+module.exports = async function (flags) {
     // Call WakaTime and Toggl APIs
-    const wakaTimeActivity = await wakaTime.getActivity(day, wakaTimeApiKey);
-    const togglInfo = await toggl.getInfo(togglApiKey);
+    const wakaTimeActivity = await wakaTime.getActivity(flags.day, flags.minDuration, flags.wakatime);
+    const togglInfo = await toggl.getInfo(flags.toggl);
 
     // List all WakaTime projects
     const wakaTimeProjects = Object.keys(
@@ -22,7 +22,7 @@ module.exports = async function (wakaTimeApiKey, togglApiKey, day) {
 
     // Create projects in Toggl
     for (const project of projectsToCreate) {
-        const created = await toggl.createProject(project, togglInfo.workspaceId, togglApiKey);
+        const created = await toggl.createProject(project, togglInfo.workspaceId, flags.toggl);
         togglInfo.projects.push(created);
         await sleep(1000); // One request / second to avoid hitting the limit
     }
@@ -50,7 +50,7 @@ module.exports = async function (wakaTimeApiKey, togglApiKey, day) {
             continue;
         }
 
-        await toggl.addEntry(projectId, start, duration, togglApiKey);
+        await toggl.addEntry(projectId, start, duration, flags.toggl);
         spinner.text = `Added ${added}/${wakaTimeActivity.length} entries to Toggl...`;
         if (duplicates > 0) {
             spinner.text += ` Found ${duplicates} duplicates`;

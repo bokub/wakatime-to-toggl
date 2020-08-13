@@ -10,9 +10,10 @@ const cli = meow(
       $ wakatime-to-toggl -w <wakatime-api-key> -t <toggl-api-key>
  
     Options
-      --wakatime, -w  Your Wakatime api key
-      --toggl,    -t  Your Toggl api key
-      --day,      -d  The day to fetch. 0 is today, 1 is yesterday... Default: 1
+      --wakatime,       -w  Your Wakatime api key
+      --toggl,          -t  Your Toggl api key
+      --day,            -d  The day to fetch. 0 is today, 1 is yesterday... Default: 1
+      --min-duration    -m  Minimum duration (in seconds) of entries to sync. Default: 120
 `,
     {
         flags: {
@@ -31,8 +32,13 @@ const cli = meow(
                 alias: 'd',
                 default: 1,
             },
+            minDuration: {
+                type: 'number',
+                alias: 'm',
+                default: 120,
+            },
         },
     }
 );
 
-syncActivity(cli.flags.wakatime, cli.flags.toggl, cli.flags.day);
+syncActivity(cli.flags);

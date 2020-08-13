@@ -58,11 +58,26 @@ You can come back to the **Actions** tab later to see the logs
 
 ## Things to know
 
--   Entries shorter than 2 minutes will be ignored
+-   Entries shorter than 2 minutes will be ignored. This duration is configurable
 -   Duplicate entries won't be added if they are detected
 -   Projects will be created in your default workspace. You can move them to another workspace if you want
 -   Time entries will be created with a default description ("Development"). You can edit it, it won't break duplicates detection
--   Run `wakatime-to-toggl --help` to see every possible option
+
+## Detailed usage
+
+```bash
+$ wakatime-to-toggl --help
+
+  Usage
+    $ wakatime-to-toggl -w <wakatime-api-key> -t <toggl-api-key>
+
+  Options
+    --wakatime,       -w  Your Wakatime api key
+    --toggl,          -t  Your Toggl api key
+    --day,            -d  The day to fetch. 0 is today, 1 is yesterday... Default: 1
+    --min-duration    -m  Minimum duration (in seconds) of entries to sync. Default: 120
+
+```
 
 [version-src]: https://runkit.io/bokub/npm-version/branches/master/wakatime-to-toggl?style=flat
 [code-style-src]: https://flat.badgen.net/badge/code%20style/prettier/ff69b4

@@ -1,8 +1,9 @@
 const axios = require('axios');
 const ora = require('ora');
+const prettyMs = require('pretty-ms');
 
 module.exports = {
-    getActivity: async function (day, apiKey) {
+    getActivity: async function (day, minDuration, apiKey) {
         const date = new Date();
         date.setDate(date.getDate() - day);
         const strDate = date.toISOString().substr(0, 10);
@@ -17,13 +18,15 @@ module.exports = {
             })
             .then((resp) => resp.data.data)
             .then((entries) => {
-                const filtered = entries.filter((e) => e.duration >= 120);
-                spinner.succeed(`Found ${entries.length} WakaTime entries for the ${strDate}.`);
+                const filtered = entries.filter((e) => e.duration >= minDuration);
+                let spinnerText = `Found ${entries.length} WakaTime entries for the ${strDate}.`;
                 if (filtered.length < entries.length) {
-                    spinner.text += `${
-                        entries.length - filtered.length
-                    } of them are shorter than 2 minutes and will be ignored.`;
+                    spinnerText += ` ${entries.length - filtered.length} of them are shorter than ${prettyMs(
+                        1000 * minDuration,
+                        { verbose: true }
+                    )} and will be ignored.`;
                 }
+                spinner.succeed(spinnerText);
                 return filtered;
             })
             .catch((err) => {
