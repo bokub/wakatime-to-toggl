@@ -2,7 +2,7 @@ const axios = require('axios');
 const ora = require('ora');
 
 const instance = axios.create({
-    baseURL: 'https://www.toggl.com/api/v8',
+    baseURL: 'https://api.track.toggl.com/api/v8',
     headers: {
         'Content-Type': 'application/json',
     },
