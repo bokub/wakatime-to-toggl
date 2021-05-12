@@ -17,7 +17,7 @@ Sync your WakaTime data in Toggl
 ## Prerequisites
 
 -   Get your Wakatime API key in [your settings](https://wakatime.com/settings/api-key)
--   Get your Toggl "API Token" at the bottom of [your profile page](https://www.toggl.com/app/profile)
+-   Get your Toggl "API Token" at the bottom of [your profile page](https://track.toggl.com/profile)
 
 ## Option 1 - Run manually on your computer
 
@@ -91,6 +91,6 @@ $ wakatime-to-toggl --help
 [downloads-src]: https://flat.badgen.net/npm/dm/wakatime-to-toggl?color=orange
 [ci-src]: https://flat.badgen.net/travis/bokub/wakatime-to-toggl
 [version-href]: https://www.npmjs.com/package/wakatime-to-toggl
-[code-style-href]: https://github.com/prettier/prettier
+[code-style-href]: https://github.com/bokub/prettier-config
 [downloads-href]: https://www.npmjs.com/package/wakatime-to-toggl
 [ci-href]: https://travis-ci.org/bokub/wakatime-to-toggl

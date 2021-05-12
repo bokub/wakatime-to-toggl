@@ -1,7 +1,7 @@
 {
     "name": "wakatime-to-toggl",
     "description": "Send your WakaTime data to Toggl",
-    "version": "0.3.2",
+    "version": "0.4.0",
     "author": "Boris K",
     "bin": {
         "wakatime-to-toggl": "cli.js"
@@ -13,7 +13,10 @@
         "pretty-ms": "^7.0.0"
     },
     "devDependencies": {
-        "prettier": "^2.0.5"
+        "@bokub/prettier-config": "^1.1.0",
+        "husky": "^6.0.0",
+        "prettier": "^2.3.0",
+        "pretty-quick": "^3.1.0"
     },
     "homepage": "https://github.com/bokub/wakatime-to-toggl",
     "keywords": [
@@ -24,13 +27,10 @@
     ],
     "license": "MIT",
     "main": "cli.js",
-    "prettier": {
-        "singleQuote": true,
-        "tabWidth": 4,
-        "printWidth": 120
-    },
+    "prettier": "@bokub/prettier-config",
     "repository": "bokub/wakatime-to-toggl",
     "scripts": {
-        "prettier": "prettier --write **/*.{js,md,json,yml}"
+        "prettier": "prettier --write **/*.{js,md,json,yml}",
+        "prepare": "husky install"
     }
 }
