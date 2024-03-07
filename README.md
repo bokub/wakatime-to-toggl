@@ -1,7 +1,7 @@
 # WakaTime to Toggl
 
 [![Build Status](https://flat.badgen.net/github/checks/bokub/wakatime-to-toggl?label=build)](https://github.com/bokub/wakatime-to-toggl/actions/workflows/run.yml?query=branch%3Amaster)
-[![Version](https://flat.badgen.net/github/release/bokub/wakatime-to-toggl?label=version)](https://github.com/bokub/wakatime-to-toggl/releases)
+[![Version](https://runkit.io/bokub/npm-version/branches/master/wakatime-to-toggl?style=flat)](https://github.com/bokub/wakatime-to-toggl/releases)
 [![Downloads](https://flat.badgen.net/npm/dm/wakatime-to-toggl?color=orange)](https://www.npmjs.com/package/wakatime-to-toggl)
 [![Code style](https://flat.badgen.net/badge/code%20style/prettier/ff69b4)](https://github.com/bokub/prettier-config)
 
