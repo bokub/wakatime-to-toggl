@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-'use strict';
 
-const meow = require('meow');
-const syncActivity = require('./src/sync');
+import meow from 'meow';
+import syncActivity from './src/sync.js';
 
 const cli = meow(
-    `
+  `
     Usage
       $ wakatime-to-toggl -w <wakatime-api-key> -t <toggl-api-key>
  
@@ -15,30 +14,31 @@ const cli = meow(
       --day,            -d  The day to fetch. 0 is today, 1 is yesterday... Default: 1
       --min-duration    -m  Minimum duration (in seconds) of entries to sync. Default: 120
 `,
-    {
-        flags: {
-            wakatime: {
-                type: 'string',
-                alias: 'w',
-                isRequired: true,
-            },
-            toggl: {
-                type: 'string',
-                alias: 't',
-                isRequired: true,
-            },
-            day: {
-                type: 'number',
-                alias: 'd',
-                default: 1,
-            },
-            minDuration: {
-                type: 'number',
-                alias: 'm',
-                default: 120,
-            },
-        },
-    }
+  {
+    flags: {
+      wakatime: {
+        type: 'string',
+        shortFlag: 'w',
+        isRequired: true,
+      },
+      toggl: {
+        type: 'string',
+        shortFlag: 't',
+        isRequired: true,
+      },
+      day: {
+        type: 'number',
+        shortFlag: 'd',
+        default: 1,
+      },
+      minDuration: {
+        type: 'number',
+        shortFlag: 'm',
+        default: 120,
+      },
+    },
+    importMeta: import.meta,
+  },
 );
 
 syncActivity(cli.flags);
