@@ -1,7 +1,7 @@
 {
   "name": "wakatime-to-toggl",
   "description": "Send your WakaTime data to Toggl",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Boris K",
   "type": "module",
   "bin": {
