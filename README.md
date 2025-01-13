@@ -5,7 +5,7 @@
 [![Downloads](https://flat.badgen.net/npm/dm/wakatime-to-toggl?color=orange)](https://www.npmjs.com/package/wakatime-to-toggl)
 [![Code style](https://flat.badgen.net/badge/code%20style/prettier/ff69b4)](https://github.com/bokub/prettier-config)
 
-Sync your WakaTime data in Toggl
+Automatically import your [WakaTime](https://wakatime.com/) data into [Toggl](https://toggl.com/)
 
 - Works with free accounts
 - Can be automated with GitHub Actions
@@ -16,7 +16,7 @@ Sync your WakaTime data in Toggl
 
 ## Prerequisites
 
-- Get your Wakatime API key in [your settings](https://wakatime.com/settings/api-key)
+- Get your WakaTime API key in [your settings](https://wakatime.com/settings/api-key)
 - Get your Toggl "API Token" at the bottom of [your profile page](https://track.toggl.com/profile)
 
 ## Option 1 - Run manually on your computer
@@ -29,8 +29,8 @@ Sync your WakaTime data in Toggl
 ## Option 2 - Run automatically everyday using GitHub Actions
 
 1. Fork this repository
-2. From your new fork, go to **Settings > Secrets**
-3. Add the following secrets using the **New secret** button:
+2. From your new fork, go to **Settings > Secrets and variables > Actions**
+3. Add the following secrets using the **New repository secret** button:
 
 - `TOGGL_API_KEY`: Your Toggl API Key
 - `WAKATIME_API_KEY`: Your Wakatime API Key
@@ -58,7 +58,7 @@ jobs:
           WAKATIME_API_KEY: '${{ secrets.WAKATIME_API_KEY }}'
 ```
 
-7. Click **Start commit** then **Commit new file** to save
+7. Click **Commit changes** then **Commit changes** to save
 
 That's it! **wakatime-to-toggl** will run every day at 2:30 AM UTC (unless you changed it in the workflow)
 
