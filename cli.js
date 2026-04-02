@@ -13,6 +13,7 @@ const cli = meow(
       --toggl,          -t  Your Toggl api key
       --day,            -d  The day to fetch. 0 is today, 1 is yesterday... Default: 1
       --min-duration    -m  Minimum duration (in seconds) of entries to sync. Default: 120
+      --skipArchived,   -s  Skip archived Toggl projects. Default: false 
 `,
   {
     flags: {
@@ -35,6 +36,11 @@ const cli = meow(
         type: 'number',
         shortFlag: 'm',
         default: 120,
+      },
+      skipArchived: {
+        type: 'boolean',
+        shortFlag: 's',
+        default: false,
       },
     },
     importMeta: import.meta,

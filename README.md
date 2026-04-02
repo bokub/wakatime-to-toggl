@@ -43,15 +43,16 @@ Automatically import your [WakaTime](https://wakatime.com/) data into [Toggl](ht
 ```yaml
 name: Run wakatime-to-toggl everyday
 on:
+  workflow_dispatch:
   schedule:
     - cron: 30 2 * * * # Everyday at 02:30 AM UTC. You can change it according to your timezone
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
       - run: npx wakatime-to-toggl -w "$WAKATIME_API_KEY" -t "$TOGGL_API_KEY"
         env:
           TOGGL_API_KEY: '${{ secrets.TOGGL_API_KEY }}'
@@ -70,6 +71,7 @@ You can come back to the **Actions** tab later to see the logs
 - Duplicate entries won't be added if they are detected
 - Projects will be created in your default workspace. You can move them to another workspace if you want
 - Time entries will be created with a default description ("Development"). You can edit it, it won't break duplicates detection
+- Archived toggl projects will be automatically unarchived. You can instead choose to ignore them using the `--skip-archived` option
 
 ## Detailed usage
 
@@ -84,4 +86,5 @@ $ wakatime-to-toggl --help
     --toggl,          -t  Your Toggl api key
     --day,            -d  The day to fetch. 0 is today, 1 is yesterday... Default: 1
     --min-duration    -m  Minimum duration (in seconds) of entries to sync. Default: 120
+    --skip-archived   -s  Skip archived Toggl projects. Default: false
 ```
