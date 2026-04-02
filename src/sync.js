@@ -22,10 +22,7 @@ export default async function (flags) {
     await sleep(1000); // One request / second to avoid hitting the limit
   }
 
-  const projects = togglInfo.projects.reduce((acc, p) => {
-    acc[p.name.toLowerCase()] = p;
-    return acc;
-  }, {});
+  const projects = Object.fromEntries(togglInfo.projects.map((p) => [p.name.toLowerCase(), p]));
 
   // Add WakaTime entries to Toggl
   let added = 0;
