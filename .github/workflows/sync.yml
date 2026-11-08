@@ -41,23 +41,40 @@ jobs:
       date: ${{ steps.date.outputs.date }}
       quota: ${{ steps.sync.outputs.quota }}
     steps:
+      - name: Check secrets
+        id: secrets
+        run: |
+          if [ -z "$TOGGL_API_KEY" ] || [ -z "$WAKATIME_API_KEY" ]; then
+            echo "::notice::TOGGL_API_KEY or WAKATIME_API_KEY is not set. Skipping sync."
+            exit 0
+          fi
+          echo "ok=true" >> "$GITHUB_OUTPUT"
+        env:
+          TOGGL_API_KEY: ${{ secrets.TOGGL_API_KEY }}
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
+
       - uses: actions/checkout@v6
+        if: steps.secrets.outputs.ok
 
       - uses: actions/setup-node@v6
+        if: steps.secrets.outputs.ok
         with:
           node-version: 24
           cache: npm
 
       - name: Install dependencies
+        if: steps.secrets.outputs.ok
         run: npm ci
 
       - name: Resolve date
+        if: steps.secrets.outputs.ok
         id: date
         run: echo "date=${INPUT_DATE:-$(date -u -d yesterday +%F)}" >> "$GITHUB_OUTPUT"
         env:
           INPUT_DATE: ${{ inputs.date }}
 
       - name: Sync
+        if: steps.secrets.outputs.ok
         id: sync
         run: |
           set +e
