@@ -1,0 +1,130 @@
+name: Sync WakaTime to Toggl
+
+on:
+  schedule:
+    - cron: 30 2 * * * # Everyday at 02:30 AM UTC. You can change it according to your timezone
+  workflow_dispatch:
+    inputs:
+      date:
+        description: Date to sync (YYYY-MM-DD). Empty means yesterday (UTC)
+        type: string
+        required: false
+      attempt:
+        description: Retry attempt number. Set by the rescheduler, leave at 1. Above 1 waits for the toggl-cooldown timer
+        type: number
+        default: 1
+
+# One chain of retries per date. A retry waits for the run that dispatched it to finish.
+concurrency:
+  group: sync-${{ inputs.date || 'scheduled' }}
+
+permissions:
+  contents: read
+
+env:
+  MAX_ATTEMPTS: 24
+
+jobs:
+  cooldown:
+    if: ${{ inputs.attempt > 1 }}
+    runs-on: ubuntu-latest
+    # The wait timer on this environment holds the job without using runner minutes
+    environment: toggl-cooldown
+    steps:
+      - run: echo "Toggl quota cooldown finished"
+
+  sync:
+    needs: cooldown
+    if: ${{ !cancelled() && (needs.cooldown.result == 'success' || needs.cooldown.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    outputs:
+      date: ${{ steps.date.outputs.date }}
+      quota: ${{ steps.sync.outputs.quota }}
+    steps:
+      - name: Check secrets
+        id: secrets
+        run: |
+          if [ -z "$TOGGL_API_KEY" ] || [ -z "$WAKATIME_API_KEY" ]; then
+            echo "::notice::TOGGL_API_KEY or WAKATIME_API_KEY is not set. Skipping sync."
+            exit 0
+          fi
+          echo "ok=true" >> "$GITHUB_OUTPUT"
+        env:
+          TOGGL_API_KEY: ${{ secrets.TOGGL_API_KEY }}
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
+
+      - uses: actions/checkout@v6
+        if: steps.secrets.outputs.ok
+
+      - uses: actions/setup-node@v6
+        if: steps.secrets.outputs.ok
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.secrets.outputs.ok
+        run: npm ci
+
+      - name: Resolve date
+        if: steps.secrets.outputs.ok
+        id: date
+        run: echo "date=${INPUT_DATE:-$(date -u -d yesterday +%F)}" >> "$GITHUB_OUTPUT"
+        env:
+          INPUT_DATE: ${{ inputs.date }}
+
+      - name: Sync
+        if: steps.secrets.outputs.ok
+        id: sync
+        run: |
+          set +e
+          node cli.js -w "$WAKATIME_API_KEY" -t "$TOGGL_API_KEY" --date "$DATE"
+          code=$?
+          # 75 = EXIT_TOGGL_QUOTA in cli.js
+          if [ "$code" -eq 75 ]; then
+            echo "quota=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Toggl quota reached for $DATE. Rescheduling."
+            exit 0
+          fi
+          exit "$code"
+        env:
+          TOGGL_API_KEY: ${{ secrets.TOGGL_API_KEY }}
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
+          DATE: ${{ steps.date.outputs.date }}
+
+  reschedule:
+    needs: sync
+    # !cancelled() because a skipped cooldown job would otherwise skip this job too
+    if: ${{ !cancelled() && needs.sync.outputs.quota == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      DATE: ${{ needs.sync.outputs.date }}
+      ATTEMPT: ${{ inputs.attempt || 1 }}
+    steps:
+      - name: Check attempt limit
+        run: |
+          if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
+            echo "::error::Toggl quota still reached after $ATTEMPT attempts for $DATE. Run this workflow manually with date=$DATE."
+            exit 1
+          fi
+
+      # Without a wait timer, GitHub creates the environment on first use and retries fire instantly
+      - name: Check cooldown environment
+        run: |
+          wait=$(gh api "repos/$GH_REPO/environments/toggl-cooldown" \
+            --jq '[.protection_rules[]? | select(.type == "wait_timer") | .wait_timer][0] // 0' 2>/dev/null || true)
+          case "$wait" in '' | *[!0-9]*) wait=0 ;; esac
+          if [ "$wait" -lt 1 ]; then
+            echo "::error::Environment toggl-cooldown has no wait timer. Create it in Settings > Environments with a 60 minute wait timer, then run this workflow manually with date=$DATE."
+            exit 1
+          fi
+          echo "Next attempt starts after a $wait minute wait"
+
+      - name: Dispatch retry
+        run: |
+          gh workflow run sync.yml --ref "$GITHUB_REF_NAME" \
+            -f date="$DATE" -f attempt="$((ATTEMPT + 1))"

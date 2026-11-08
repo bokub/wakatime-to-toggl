@@ -1,10 +1,11 @@
 import { getActivity } from './wakatime.js';
-import { addEntry, createProject, getInfo, unarchiveProject } from './toggl.js';
+import { addEntry, createProject, getInfo, TogglQuotaError, unarchiveProject } from './toggl.js';
 import ora from 'ora';
 
 export default async function (flags) {
   // Call WakaTime and Toggl APIs
-  const wakaTimeActivity = await getActivity(flags.day, flags.minDuration, flags.wakatime);
+  const date = flags.date || dayToDate(flags.day);
+  const wakaTimeActivity = await getActivity(date, flags.minDuration, flags.wakatime);
   const togglInfo = await getInfo(flags.toggl);
 
   // List all WakaTime projects
@@ -58,6 +59,10 @@ export default async function (flags) {
       // Add entry to project
       await addEntry(project.id, togglInfo.workspaceId, start, duration, flags.toggl);
     } catch (err) {
+      if (err instanceof TogglQuotaError) {
+        spinner.fail(`Toggl API quota reached after adding ${added}/${wakaTimeActivity.length} entries`);
+        throw err;
+      }
       spinner.fail(`Failed to add entry for project "${entry.project}"`);
       throw new Error(`${err.message} (Project: "${entry.project}", Start: ${start}, Duration: ${duration}s)`);
     }
@@ -73,6 +78,12 @@ export default async function (flags) {
   if (duplicates > 0) {
     ora(`${duplicates} entries were already in Toggl.`).info();
   }
+}
+
+function dayToDate(day) {
+  const date = new Date();
+  date.setDate(date.getDate() - day);
+  return date.toISOString().substr(0, 10);
 }
 
 function sleep(ms) {

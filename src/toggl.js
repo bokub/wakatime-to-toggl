@@ -1,5 +1,6 @@
 import axios from 'axios';
 import ora from 'ora';
+import prettyMs from 'pretty-ms';
 
 let instance = axios.create({
   baseURL: 'https://api.track.toggl.com/api/v9',
@@ -7,6 +8,22 @@ let instance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Toggl answers 402 when the hourly API quota of the plan is used up
+export class TogglQuotaError extends Error {
+  name = 'TogglQuotaError';
+}
+
+function togglError(err, context) {
+  const errorDetails = err.response?.data || err.message || err;
+  const errorMessage = typeof errorDetails === 'string' ? errorDetails : JSON.stringify(errorDetails);
+  if (err.response?.status === 402) {
+    const resetsIn = Number(err.response.headers?.['x-toggl-quota-resets-in']);
+    const resetNote = resetsIn ? ` (quota resets in ${prettyMs(resetsIn * 1000, { verbose: true })})` : '';
+    return new TogglQuotaError(`Toggl API quota reached while trying to ${context}: ${errorMessage}${resetNote}`);
+  }
+  return new Error(`cannot ${context}: ${errorMessage}`);
+}
 
 export function getInfo(apiKey) {
   const spinner = ora(`Fetching Toggl projects...`).start();
@@ -38,7 +55,7 @@ export function getInfo(apiKey) {
     })
     .catch((err) => {
       spinner.fail('Cannot fetch Toggl projects');
-      throw new Error(`cannot fetch Toggl projects: ${err.response.data || err}`);
+      throw togglError(err, 'fetch Toggl projects');
     });
 }
 export async function createProject(name, workspaceId, apiKey) {
@@ -63,9 +80,7 @@ export async function createProject(name, workspaceId, apiKey) {
     })
     .catch((err) => {
       spinner.fail(`Cannot create Toggl project "${name}"`);
-      const errorDetails = err.response?.data || err.message || err;
-      const errorMessage = typeof errorDetails === 'string' ? errorDetails : JSON.stringify(errorDetails);
-      throw new Error(`cannot create Toggl project "${name}": ${errorMessage}`);
+      throw togglError(err, `create Toggl project "${name}"`);
     });
 }
 export async function addEntry(projectId, workspaceId, start, duration, apiKey) {
@@ -89,9 +104,7 @@ export async function addEntry(projectId, workspaceId, start, duration, apiKey) 
     )
     .then((resp) => resp.data)
     .catch((err) => {
-      const errorDetails = err.response?.data || err.message || err;
-      const errorMessage = typeof errorDetails === 'string' ? errorDetails : JSON.stringify(errorDetails);
-      throw new Error(`cannot create Toggl entry for project ID ${projectId}: ${errorMessage}`);
+      throw togglError(err, `create Toggl entry for project ID ${projectId}`);
     });
 }
 export async function unarchiveProject(projectId, workspaceId, apiKey) {
@@ -110,8 +123,6 @@ export async function unarchiveProject(projectId, workspaceId, apiKey) {
     )
     .then((resp) => resp.data)
     .catch((err) => {
-      const errorDetails = err.response?.data || err.message || err;
-      const errorMessage = typeof errorDetails === 'string' ? errorDetails : JSON.stringify(errorDetails);
-      throw new Error(`cannot unarchive Toggl project ID ${projectId}: ${errorMessage}`);
+      throw togglError(err, `unarchive Toggl project ID ${projectId}`);
     });
 }
