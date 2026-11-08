@@ -16,14 +16,14 @@ Automatically import your [WakaTime](https://wakatime.com/) data into [Toggl](ht
 
 ## Prerequisites
 
-- Get your WakaTime API key in [your settings](https://wakatime.com/settings/api-key)
+- Get your WakaTime personal OAuth token on [this page](https://wakatime.com/oauth). Since November 1, 2026, WakaTime API keys only work for editor plugins and return 403 here
 - Get your Toggl "API Token" at the bottom of [your profile page](https://track.toggl.com/profile)
 
 ## Option 1 - Run manually on your computer
 
 1.  Download and install [Node.js](https://nodejs.org/en/download/)
 2.  Install **wakatime-to-toggl** with `npm i -g wakatime-to-toggl`
-3.  Run the following command to sync data from yesterday: `wakatime-to-toggl -w <wakatime-api-key> -t <toggl-api-key>`
+3.  Run the following command to sync data from yesterday: `wakatime-to-toggl -w <wakatime-oauth-token> -t <toggl-api-key>`
 4.  Ideally, run **wakatime-to-toggl** everyday
 
 ## Option 2 - Run automatically everyday using GitHub Actions
@@ -33,7 +33,7 @@ Automatically import your [WakaTime](https://wakatime.com/) data into [Toggl](ht
 3. Add the following secrets using the **New repository secret** button:
 
 - `TOGGL_API_KEY`: Your Toggl API Key
-- `WAKATIME_API_KEY`: Your Wakatime API Key
+- `WAKATIME_API_KEY`: Your WakaTime personal OAuth token (the secret name stays the same for compatibility)
   ![Screenshot](https://user-images.githubusercontent.com/17952318/86905384-4934f180-c112-11ea-91cd-7b391cd7e5de.png)
 
 4. Go to the **Actions** tab of your fork
@@ -79,10 +79,10 @@ You can come back to the **Actions** tab later to see the logs
 $ wakatime-to-toggl --help
 
   Usage
-    $ wakatime-to-toggl -w <wakatime-api-key> -t <toggl-api-key>
+    $ wakatime-to-toggl -w <wakatime-oauth-token> -t <toggl-api-key>
 
   Options
-    --wakatime,       -w  Your Wakatime api key
+    --wakatime,       -w  Your WakaTime personal OAuth token
     --toggl,          -t  Your Toggl api key
     --day,            -d  The day to fetch. 0 is today, 1 is yesterday... Default: 1
     --min-duration    -m  Minimum duration (in seconds) of entries to sync. Default: 120
