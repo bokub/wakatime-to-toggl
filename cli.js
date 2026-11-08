@@ -6,10 +6,10 @@ import syncActivity from './src/sync.js';
 const cli = meow(
   `
     Usage
-      $ wakatime-to-toggl -w <wakatime-api-key> -t <toggl-api-key>
+      $ wakatime-to-toggl -w <wakatime-oauth-token> -t <toggl-api-key>
  
     Options
-      --wakatime,       -w  Your Wakatime api key
+      --wakatime,       -w  Your WakaTime personal OAuth token
       --toggl,          -t  Your Toggl api key
       --day,            -d  The day to fetch. 0 is today, 1 is yesterday... Default: 1
       --min-duration    -m  Minimum duration (in seconds) of entries to sync. Default: 120
