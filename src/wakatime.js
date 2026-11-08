@@ -2,10 +2,7 @@ import axios from 'axios';
 import ora from 'ora';
 import prettyMs from 'pretty-ms';
 
-export async function getActivity(day, minDuration, apiKey) {
-  const date = new Date();
-  date.setDate(date.getDate() - day);
-  const strDate = date.toISOString().substr(0, 10);
+export async function getActivity(strDate, minDuration, apiKey) {
   const spinner = ora(`Fetching WakaTime data for the ${strDate}...`).start();
 
   return axios
